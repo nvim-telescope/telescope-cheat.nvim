@@ -7,44 +7,47 @@ local utils = require("telescope.utils")
 local actions = require("telescope.actions")
 local entry_display = require("telescope.pickers.entry_display")
 local data = require('telescope._extensions.cheat.db')
+
 local previewer = utils.make_default_callable(function(_)
-  previewers.new_buffer_previewer {
+  local get_entry_name = function(entry)
+    return entry.value.ns .. '/' .. entry.value.keyword
+  end
+
+  return previewers.new_buffer_previewer {
     keep_last_buf = true,
-    get_buffer_by_name = function(_, entry) return entry.ns .. "/" .. entry.keyword end,
-    define_preview = function(self, entry, status)
-      if entry.ns .. "/" .. entry.keyword ~= self.state.bufname then
-      vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, vim.fn.json_decode(entry.content))
-      vim.api.nvim_win_set_option(self.state.preview_win, "wrap", true)
-      putils.highlighter(self.state.bufnr, entry.ft)
+    get_buffer_by_name = function(_, entry)
+      return get_entry_name(entry)
+    end,
+    define_preview = function(self, entry)
+      if get_entry_name(entry) ~= self.state.bufname then
+        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, vim.fn.json_decode(entry.value.content))
+        putils.highlighter(self.state.bufnr, entry.value.ft)
       end
     end
   }
 end)
 
-local make_display = function(entry)
-  local displayer = entry_display.create{
-    separator = " ",
-    hl_chars = { ["|"] = "TelescopeResultsNumber" },
-    items = {
-      {width = 30},
-      {remaining = true},
-      {remaining = true}
-    }
+local displayer = entry_display.create{
+  separator = " ",
+  hl_chars = { ["|"] = "TelescopeResultsNumber" },
+  items = {
+    { width = 30 },
+    { remaining = true },
   }
+}
 
+local make_display = function(entry)
   return displayer {
-    {entry.keyword, "TelescopeResultsNumber"},
-    {entry.ns, "TabLine"},
+    { entry.value.keyword, "TelescopeResultsNumber" },
+    { entry.value.ns, "TabLine" },
   }
 end
 
 local entry_maker = function(entry)
   return {
-    name = entry.name,
-    ns = entry.ns,
-    content = entry.content,
-    ft = entry.ft,
-    ordinal = entry.ns .. " " .. entry.name
+    value = entry,
+    ordinal = entry.ns .. " " .. entry.keyword,
+    display = make_display
   }
 end
 
@@ -65,8 +68,9 @@ local set_mappings = function(prompt_bufnr)
   return true
 end
 
-local cheat_fd = function(opts) -- TODO Make it non blocking
+local cheat_fd = function(opts)
   opts = opts or {}
+
   pickers.new(opts, {
     prompt_title = 'Cheats',
     finder = finders.new_table{
