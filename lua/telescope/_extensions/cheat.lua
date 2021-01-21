@@ -1,42 +1,51 @@
-local has_telescope, telescope = pcall(require, 'telescope')
-if not has_telescope then
-  error('This plugins requires nvim-telescope/telescope.nvim')
-end
-
-local curl = require("plenary.curl")
 local finders = require("telescope.finders")
 local pickers = require("telescope.pickers")
 local conf = require("telescope.config").values
 local previewers = require("telescope.previewers")
-local putils = require('telescope.previewers.utils')
-local actions = require('telescope.actions')
+local putils = require("telescope.previewers.utils")
+local utils = require("telescope.utils")
+local actions = require("telescope.actions")
+local entry_display = require("telescope.pickers.entry_display")
+local data = require('telescope._extensions.cheat.db')
+local previewer = utils.make_default_callable(function(_)
+  previewers.new_buffer_previewer {
+    keep_last_buf = true,
+    get_buffer_by_name = function(_, entry) return entry.ns .. "/" .. entry.keyword end,
+    define_preview = function(self, entry, status)
+      if entry.ns .. "/" .. entry.keyword ~= self.state.bufname then
+      vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, vim.fn.json_decode(entry.content))
+      vim.api.nvim_win_set_option(self.state.preview_win, "wrap", true)
+      putils.highlighter(self.state.bufnr, entry.ft)
+      end
+    end
+  }
+end)
 
-local get_query = function(qry)
-  local query, filetype
-  if qry == nil or vim.tbl_isempty(qry) then
-    query = ":list"
-  elseif qry.child == nil then
-    query = string.format("%s/:list", qry.ft)
-    filetype = qry.ft
-  else
-    query = string.format("%s/%s", qry.ft, qry.child)
-    filetype = qry.ft
-  end
-  return "cht.sh/"..query.."?T"
+local make_display = function(entry)
+  local displayer = entry_display.create{
+    separator = " ",
+    hl_chars = { ["|"] = "TelescopeResultsNumber" },
+    items = {
+      {width = 30},
+      {remaining = true},
+      {remaining = true}
+    }
+  }
+
+  return displayer {
+    {entry.keyword, "TelescopeResultsNumber"},
+    {entry.ns, "TabLine"},
+  }
 end
 
-local preview_entry = function(value, ft, bufnr, bufname)
-  if value ~= bufname then
-    local url = get_query{ft = ft, child = value}
-    curl.get(url,{
-      callback = vim.schedule_wrap(function(results)
-        if vim.api.nvim_buf_is_valid(bufnr) then
-          vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(results.body, '\n'))
-        end
-      end)
-    })
-  end
-  putils.highlighter(bufnr, ft)
+local entry_maker = function(entry)
+  return {
+    name = entry.name,
+    ns = entry.ns,
+    content = entry.content,
+    ft = entry.ft,
+    ordinal = entry.ns .. " " .. entry.name
+  }
 end
 
 local set_mappings = function(prompt_bufnr)
@@ -58,42 +67,28 @@ end
 
 local cheat_fd = function(opts) -- TODO Make it non blocking
   opts = opts or {}
-
-  local res = (function()
-    local ret = curl.get(get_query(opts))
-    if ret.status == 200 then
-      return vim.split(ret.body, "\n")
-    end
-  end)()
-
   pickers.new(opts, {
     prompt_title = 'Cheats',
-    finder = finders.new_table{ results = res },
-    sorter = conf.generic_sorter(opts),
-    -- ft = res.ft, -- incase we want to have recusive finders.
-    previewer = previewers.new_buffer_previewer{
-      keep_last_buf = true,
-      get_buffer_by_name = function(_, entry)
-        return entry.value
-      end,
-      define_preview = function(self, entry, status)
-        putils.with_preview_window(status, nil, function()
-          preview_entry(entry.value, self.ft, self.state.bufnr, self.state.bufname)
-        end)
-      end
+    finder = finders.new_table{
+      results = data:get(),
+      entry_maker = entry_maker
     },
+    sorter = conf.generic_sorter(opts),
+    previewer = previewer.new(opts),
     attach_mappings = set_mappings
   }):find()
 end
 
-local cheat_current_ft = function(opts)
-  opts = opts or {}
-  cheat_fd(vim.tbl_extend("keep", opts, {ft = vim.bo.filetype}))
-end
+data:seed(cheat_fd)
 
-return telescope.register_extension {
-  exports = {
-    cheat_fd = cheat_fd,
-    cheat_current_ft = cheat_current_ft
-  }
-}
+-- local cheat_current_ft = function(opts)
+--   opts = opts or {}
+--   cheat_fd(vim.tbl_extend("keep", opts, {ft = vim.bo.filetype}))
+-- end
+
+-- return require'telescope'.register_extension {
+--   exports = {
+--     cheat_fd = cheat_fd,
+--     -- cheat_current_ft = cheat_current_ft
+--   }
+-- }
