@@ -3,24 +3,8 @@ local scan = require'plenary.scandir'
 local sources = require'telescope._extensions.cheat.sources'
 local M = {}
 
-local function remove_dir(cwd)
-   local handle = vim.loop.fs_scandir(cwd)
-  while true do
-    local name, t = vim.loop.fs_scandir_next(handle)
-    if not name then break end
-
-    local new_cwd = cwd..'/'..name
-    if t == 'directory' then
-      local success = remove_dir(new_cwd)
-      if not success then return false end
-    else
-      local success = vim.loop.fs_unlink(new_cwd)
-      if not success then return false end
-    end
-  end
-
-  return vim.loop.fs_rmdir(cwd)
-end
+local extract_path = nil
+local __get
 
 local clone = function(uri, path, cb)
   return j:new({
@@ -37,7 +21,7 @@ local clone = function(uri, path, cb)
 end
 
 local get_source_path = function(cb, source)
-  local path = "/tmp/cheat_sources/" .. source.name
+  local path = extract_path .. '/' .. source.name
   if vim.loop.fs_stat(path) == nil then
     local await = function() cb(path) end
     clone(source.uri, path, await)
@@ -74,7 +58,6 @@ local extract_data = function(cb, source)
   end), source)
 end
 
-local __get
 __get = function(cb, lsources, data) -- conni <3
   if table.getn(lsources) > 0 then
     local source = table.remove(lsources, 1)
@@ -82,15 +65,20 @@ __get = function(cb, lsources, data) -- conni <3
       for _, v in ipairs(res) do
         table.insert(data, v)
       end
-      remove_dir("/tmp/cheat_sources/" .. source.name)
       __get(cb, lsources, data)
     end, source)
   else
+    extract_path = nil
     return cb(data)
   end
 end
 
 M.get = function(cb)
+  if extract_path then return end
+
+  extract_path = os.tmpname()
+  os.remove(extract_path)
+
   local data = {}
   local lsources = vim.deepcopy(sources)
   __get(cb, lsources, data)
