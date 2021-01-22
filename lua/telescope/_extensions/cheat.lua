@@ -74,7 +74,7 @@ local cheat_fd = function(opts)
   pickers.new(opts, {
     prompt_title = 'Cheats',
     finder = finders.new_table{ results = data:get(), entry_maker = entry_maker },
-    sorter = conf.generic_sorter(opts),
+    sorter = conf.generic_sorter(opts), -- shouldn't this be default?
     previewer = previewer.new(opts),
     attach_mappings = set_mappings
   }):find()
@@ -88,9 +88,7 @@ return require'telescope'.register_extension {
       end)
     end,
     recache = function(_)
-      return data:recache(function()
-        return print("cheat-telesocpe.nvim databases has been recached.")
-      end)
+      return data:recache()
     end
   }
 }

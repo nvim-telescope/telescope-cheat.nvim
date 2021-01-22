@@ -74,7 +74,8 @@ local extract_data = function(cb, source)
   end), source)
 end
 
-M.__get = function(cb, lsources, data) -- conni <3
+local __get
+__get = function(cb, lsources, data) -- conni <3
   if table.getn(lsources) > 0 then
     local source = table.remove(lsources, 1)
     extract_data(function(res)
@@ -82,7 +83,7 @@ M.__get = function(cb, lsources, data) -- conni <3
         table.insert(data, v)
       end
       remove_dir("/tmp/cheat_sources/" .. source.name)
-      M.__get(cb, lsources, data)
+      __get(cb, lsources, data)
     end, source)
   else
     return cb(data)
@@ -92,7 +93,7 @@ end
 M.get = function(cb)
   local data = {}
   local lsources = vim.deepcopy(sources)
-  M.__get(cb, lsources, data)
+  __get(cb, lsources, data)
 end
 
 return M
