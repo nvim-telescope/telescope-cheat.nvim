@@ -9,18 +9,15 @@ local db = sql.new((function()
   return d  .. "/telescope-cheat.db"
 end)())
 
-local state = db:table("state")
-
-function state:__ensure_schema()
-  return self:schema {
+local state = db:table("state", {
+  schema = {
     id = "number",
     version = "number",
-    ensure = true
   }
-end
+})
 
 function state:get_version()
-  self:__ensure_schema()
+  -- self:__ensure_schema()
   local version = self:get({ where = {id = 1}, keys = "version" })
   return version[1] and version[1].version
 end
@@ -39,23 +36,18 @@ function state:change_version()
   }
 end
 
-local data = db:table("cheat")
-
-function data:__ensure_schema()
-  return self:schema {
+local data = db:table("cheat", {
+  schema = {
     id = {"integer", "primary", "key"},
     source = "text",
     ns = "text",
     keyword = "text",
     content = "text",
-    ft = "text",
-    ensure = true
+    ft = "text"
   }
-end
+})
 
 function data:seed(cb)
-  self:__ensure_schema()
-
   print("telesocpe-cheat.nvim: caching databases ........................ ")
   return raw.get(function(rows)
     self:insert(rows)
@@ -65,8 +57,6 @@ function data:seed(cb)
 end
 
 function data:recache(cb)
-  self:__ensure_schema()
-
   print("telesocpe-cheat.nvim: recaching databases ...................... ")
   return raw.get(function(rows)
     print("telesocpe-cheat.nvim: databases has been successfully recached.")
@@ -76,12 +66,10 @@ function data:recache(cb)
 end
 
 function data:ensure(cb)
-  self:__ensure_schema()
-
   local up_to_date = state:is_up_to_date()
   local has_content = not self:empty()
 
-  if up_to_date and not has_content  then
+  if up_to_date and not has_content then
     return self:seed(cb)
   elseif not up_to_date and has_content then
     state:change_version()
@@ -90,6 +78,5 @@ function data:ensure(cb)
     cb()
   end
 end
-
 
 return data
