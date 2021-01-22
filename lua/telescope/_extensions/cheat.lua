@@ -73,26 +73,24 @@ local cheat_fd = function(opts)
 
   pickers.new(opts, {
     prompt_title = 'Cheats',
-    finder = finders.new_table{
-      results = data:get(),
-      entry_maker = entry_maker
-    },
+    finder = finders.new_table{ results = data:get(), entry_maker = entry_maker },
     sorter = conf.generic_sorter(opts),
     previewer = previewer.new(opts),
     attach_mappings = set_mappings
   }):find()
 end
 
-data:seed(cheat_fd)
-
--- local cheat_current_ft = function(opts)
---   opts = opts or {}
---   cheat_fd(vim.tbl_extend("keep", opts, {ft = vim.bo.filetype}))
--- end
-
--- return require'telescope'.register_extension {
---   exports = {
---     cheat_fd = cheat_fd,
---     -- cheat_current_ft = cheat_current_ft
---   }
--- }
+return require'telescope'.register_extension {
+  exports = {
+    fd = function(opts)
+      return data:ensure(function()
+        return cheat_fd(opts)
+      end)
+    end,
+    recache = function(_)
+      return data:recache(function()
+        return print("cheat-telesocpe.nvim databases has been recached.")
+      end)
+    end
+  }
+}
