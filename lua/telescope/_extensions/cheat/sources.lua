@@ -15,7 +15,7 @@ local parse  = function(path)
   end
 
   return vim.fn.json_encode(content)
-end,
+end
 
 M[1] =  {
   name = "cheatsheets",

@@ -1,6 +1,6 @@
 local j = require'plenary.job'
 local scan = require'plenary.scandir'
-local sources = require
+local sources = require'telescope._extensions.cheat.sources'
 local M = {}
 
 local function remove_dir(cwd)
@@ -91,7 +91,7 @@ end
 
 M.get = function(cb)
   local data = {}
-  local lsources = vim.deepcopy(M.sources)
+  local lsources = vim.deepcopy(sources)
   M.__get(cb, lsources, data)
 end
 
