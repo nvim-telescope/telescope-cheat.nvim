@@ -20,7 +20,7 @@ local previewer = utils.make_default_callable(function(_)
     end,
     define_preview = function(self, entry)
       if get_entry_name(entry) ~= self.state.bufname then
-        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, vim.fn.json_decode(entry.value.content))
+        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, vim.split(entry.value.content, '\n'))
         putils.highlighter(self.state.bufnr, entry.value.ft)
       end
     end
@@ -46,7 +46,7 @@ end
 local entry_maker = function(entry)
   return {
     value = entry,
-    ordinal = entry.ns .. " " .. entry.keyword,
+    ordinal = entry.keyword .. ' ' .. entry.ns,
     display = make_display
   }
 end

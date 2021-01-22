@@ -14,7 +14,7 @@ local parse  = function(path)
     table.remove(content, 1)
   end
 
-  return vim.fn.json_encode(content)
+  return table.concat(content, '\n')
 end
 
 M[1] =  {
@@ -45,6 +45,5 @@ M[2] = {
     return "lang", path:match('.*/([^./]+).*')
   end
 }
-
 
 return M
