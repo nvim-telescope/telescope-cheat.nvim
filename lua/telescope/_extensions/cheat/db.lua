@@ -21,7 +21,7 @@ local tbl = function()
     ensure = true
   }
 
-  tbl.seed = function(self, cb)
+  tbl.ensure = function(self, cb)
     if not self.has_content then
       return raw.get(function(rows)
         self:insert(rows)
@@ -34,8 +34,10 @@ local tbl = function()
 
   tbl.recache = function(self, cb)
     if self.has_content then
-      self:remove()
-      self:seed(cb)
+      return raw.get(function(rows)
+        self:replace(rows)
+        cb()
+      end)
     end
   end
   return tbl
