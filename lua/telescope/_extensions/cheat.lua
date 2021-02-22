@@ -61,7 +61,7 @@ local cheat_fd = function(opts)
       end
     },
     attach_mappings = function()
-      actions._goto_file_selection:replace(function(prompt_bufnr, cmd)
+      actions.select_default:replace(function(prompt_bufnr, cmd)
         actions.close(prompt_bufnr)
         local last_bufnr = require'telescope.state'.get_global_key('last_preview_bufnr')
         if cmd == 'edit' then
