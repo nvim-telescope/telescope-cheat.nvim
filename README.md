@@ -1,13 +1,13 @@
 # telescope-cheat.nvim
 
-An attempt to recreate cheat.sh with lua, neovim, [sql.nvim](https://github.com/tami5/sql.nvim), and telescope.nvim.
+An attempt to recreate cheat.sh with lua, neovim, [sqlite.lua](https://github.com/tami5/sqlite.lua), and telescope.nvim.
 
 ![](./preview.gif)
 
-## Installation 
+## Installation
 
 ```lua
-Plug 'tami5/sql.nvim'
+Plug 'tami5/sqlite.lua'
 Plug 'nvim-telescope/telescope-cheat.nvim'
 
 lua require'telescope'.load_extension("cheat")
@@ -17,17 +17,17 @@ lua require'telescope'.load_extension("cheat")
 ## Usage
 
 ```vim
-:Telescope cheat fd 
+:Telescope cheat fd
 :Telescope cheat recache " cheat will be auto cached with new updates on sources
 ```
 
-## Contribution 
+## Contribution
 
-New sources can be defined in [./lua/telescope/\_extensions/cheat/sources.lua](https://github.com/nvim-telescope/telescope-cheat.nvim/blob/dev/lua/telescope/_extensions/cheat/sources.lua). 
+New sources can be defined in [./lua/telescope/\_extensions/cheat/sources.lua](https://github.com/nvim-telescope/telescope-cheat.nvim/blob/dev/lua/telescope/_extensions/cheat/sources.lua).
 
 Example:
 
-```lua 
+```lua
 
 M[2] = {
   name = "learnxinyminutes",
