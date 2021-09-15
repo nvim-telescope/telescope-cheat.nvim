@@ -1,25 +1,33 @@
 local raw = require'telescope._extensions.cheat.raw'
-local sql = require'sql'
+local sqlite = require'sqlite'
 
 local VERSION = 0.1 -- should be incremented when sources/presentation/parsing changes.
 
-local db = sql.new((function()
-  local d = vim.fn.stdpath("data") .. "/databases"
-  if not vim.loop.fs_stat(d) then vim.loop.fs_mkdir(d, 493) end
-  return d  .. "/telescope-cheat.db"
-end)())
-
-local state = db:table("state", {
-  schema = {
+local dbdir = vim.fn.stdpath("data") .. "/databases"
+---@class CheatDB:sqlite_db
+---@field state sqlite_tbl
+---@field cheat sqlite_tbl
+local db = sqlite {
+  uri = dbdir .. "/telescope-cheat.db",
+  state = {
     id = "number",
-    version = "number",
+    version = "number"
+  },
+  cheat = {
+    id = {"integer", "primary", "key"},
+    source = "text",
+    ns = "text",
+    keyword = "text",
+    content = "text",
+    ft = "text"
   }
-})
+}
+---@type sqlite_tbl
+local state, data = db.state, db.cheat
 
 function state:get_version()
-  -- self:__ensure_schema()
-  local version = self:get({ where = {id = 1}, keys = "version" })
-  return version[1] and version[1].version
+  local version = self:where {id = 1}
+  return version and version.version or nil
 end
 
 function state:is_up_to_date()
@@ -30,22 +38,11 @@ function state:is_up_to_date()
 end
 
 function state:change_version()
-  return self:update{
+  return self:update {
     where = { id = 1 },
     values = { version = VERSION }
   }
 end
-
-local data = db:table("cheat", {
-  schema = {
-    id = {"integer", "primary", "key"},
-    source = "text",
-    ns = "text",
-    keyword = "text",
-    content = "text",
-    ft = "text"
-  }
-})
 
 function data:seed(cb)
   print("telesocpe-cheat.nvim: caching databases ........................ ")
@@ -66,6 +63,10 @@ function data:recache(cb)
 end
 
 function data:ensure(cb)
+  if not vim.loop.fs_stat(dbdir) then
+    vim.loop.fs_mkdir(dbdir, 493)
+  end
+
   local up_to_date = state:is_up_to_date()
   local has_content = not self:empty()
 
