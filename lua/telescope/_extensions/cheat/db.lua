@@ -25,6 +25,7 @@ local db = sqlite {
   opt = {
     lazy = true,
   },
+
 }
 ---@type sqlite_tbl
 local state, data = db.state, db.cheat
