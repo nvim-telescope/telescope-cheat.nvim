@@ -1,12 +1,11 @@
-local finders = require("telescope.finders")
-local pickers = require("telescope.pickers")
+local finders = require "telescope.finders"
+local pickers = require "telescope.pickers"
 local conf = require("telescope.config").values
-local previewers = require("telescope.previewers")
-local putils = require("telescope.previewers.utils")
-local utils = require("telescope.utils")
-local actions = require("telescope.actions")
-local entry_display = require("telescope.pickers.entry_display")
-local data = require('telescope._extensions.cheat.db')
+local previewers = require "telescope.previewers"
+local putils = require "telescope.previewers.utils"
+local actions = require "telescope.actions"
+local entry_display = require "telescope.pickers.entry_display"
+local data = require "telescope._extensions.cheat.db"
 
 local cheat_fd = function(opts)
   opts = opts or {}
@@ -17,17 +16,17 @@ local cheat_fd = function(opts)
   end
 
   local concat_entry_name = function(entry)
-    return entry.value.ns .. '/' .. entry.value.keyword
+    return entry.value.ns .. "/" .. entry.value.keyword
   end
 
   local entry_maker = function(entry)
-    local displayer = entry_display.create{
+    local displayer = entry_display.create {
       separator = " ",
       hl_chars = { ["|"] = "TelescopeResultsNumber" },
       items = {
         { width = 30 },
         { remaining = true },
-      }
+      },
     }
 
     local make_display = function(entry)
@@ -39,14 +38,14 @@ local cheat_fd = function(opts)
 
     return {
       value = entry,
-      ordinal = entry.keyword .. ' ' .. entry.ns,
-      display = make_display
+      ordinal = entry.keyword .. " " .. entry.ns,
+      display = make_display,
     }
   end
 
   pickers.new(opts, {
-    prompt_title = 'Cheats',
-    finder = finders.new_table{ results = output, entry_maker = entry_maker },
+    prompt_title = "Cheats",
+    finder = finders.new_table { results = output, entry_maker = entry_maker },
     sorter = conf.generic_sorter(opts), -- shouldn't this be default?
     previewer = previewers.new_buffer_previewer {
       keep_last_buf = true,
@@ -55,32 +54,32 @@ local cheat_fd = function(opts)
       end,
       define_preview = function(self, entry)
         if concat_entry_name(entry) ~= self.state.bufname then
-          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, vim.split(entry.value.content, '\n'))
+          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, vim.split(entry.value.content, "\n"))
           putils.highlighter(self.state.bufnr, entry.value.ft)
         end
-      end
+      end,
     },
     attach_mappings = function()
       actions.select_default:replace(function(prompt_bufnr, cmd)
         actions.close(prompt_bufnr)
-        local last_bufnr = require'telescope.state'.get_global_key('last_preview_bufnr')
-        if cmd == 'edit' then
+        local last_bufnr = require("telescope.state").get_global_key "last_preview_bufnr"
+        if cmd == "edit" then
           vim.cmd(string.format(":buffer %d", last_bufnr))
-        elseif cmd == 'new' then
+        elseif cmd == "new" then
           vim.cmd(string.format(":sbuffer %d", last_bufnr))
-        elseif cmd == 'vnew' then
+        elseif cmd == "vnew" then
           vim.cmd(string.format(":vert sbuffer %d", last_bufnr))
-        elseif cmd == 'tabedit' then
+        elseif cmd == "tabedit" then
           vim.cmd(string.format(":tab sb %d", last_bufnr))
         end
       end)
 
       return true
-    end
+    end,
   }):find()
 end
 
-return require'telescope'.register_extension {
+return require("telescope").register_extension {
   exports = {
     fd = function(opts)
       return data:ensure(function()
@@ -89,6 +88,6 @@ return require'telescope'.register_extension {
     end,
     recache = function(_)
       return data:recache()
-    end
-  }
+    end,
+  },
 }
