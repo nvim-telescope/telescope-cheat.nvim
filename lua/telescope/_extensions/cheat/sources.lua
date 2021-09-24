@@ -1,23 +1,24 @@
-local p = require'plenary.path'
+local p = require "plenary.path"
 local M = {}
-
-local parse  = function(path)
+local parse = function(path)
   local content = p.readlines(path)
-  if content[1]:find('---', 1, true) then
+  if content[1]:find("---", 1, true) then
     local minus_count = 0
     while minus_count < 2 do
-      if content[1]:find('---', 1, true) then minus_count = minus_count + 1 end
+      if content[1]:find("---", 1, true) then
+        minus_count = minus_count + 1
+      end
       table.remove(content, 1)
     end
   end
-  while content[1] == '' do
+  while content[1] == "" do
     table.remove(content, 1)
   end
 
-  return table.concat(content, '\n')
+  return table.concat(content, "\n")
 end
 
-M[1] =  {
+M[1] = {
   name = "cheatsheets",
   uri = "https://github.com/cheat/cheatsheets",
   ns = "unix",
@@ -29,7 +30,7 @@ M[1] =  {
     local name = vim.split(path, "/")
     local a, b = unpack(vim.split(name[#name], "-"))
     return a, b
-  end
+  end,
 }
 
 M[2] = {
@@ -42,8 +43,8 @@ M[2] = {
   ft = "markdown",
   parse = parse,
   get_ns_keyword = function(path)
-    return "lang", path:match('.*/([^./]+).*')
-  end
+    return "lang", path:match ".*/([^./]+).*"
+  end,
 }
 
 return M
