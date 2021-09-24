@@ -5,13 +5,11 @@ local previewers = require "telescope.previewers"
 local putils = require "telescope.previewers.utils"
 local actions = require "telescope.actions"
 local entry_display = require "telescope.pickers.entry_display"
-local data = require "telescope._extensions.cheat.db"
 
 local cheat_fd = function(opts)
   opts = opts or {}
 
-  local output = data:get()
-  if not output or table.getn(output) == 0 then
+  if not opts.data or #opts.data == 0 then
     return
   end
 
@@ -45,7 +43,7 @@ local cheat_fd = function(opts)
 
   pickers.new(opts, {
     prompt_title = "Cheats",
-    finder = finders.new_table { results = output, entry_maker = entry_maker },
+    finder = finders.new_table { results = opts.data, entry_maker = entry_maker },
     sorter = conf.generic_sorter(opts), -- shouldn't this be default?
     previewer = previewers.new_buffer_previewer {
       keep_last_buf = true,
@@ -82,12 +80,14 @@ end
 return require("telescope").register_extension {
   exports = {
     fd = function(opts)
+      local data = require "telescope._extensions.cheat.db"
+      opts.data = data:get()
       return data:ensure(function()
         return cheat_fd(opts)
       end)
     end,
     recache = function(_)
-      return data:recache()
+      require("telescope._extensions.cheat.db"):recache()
     end,
   },
 }

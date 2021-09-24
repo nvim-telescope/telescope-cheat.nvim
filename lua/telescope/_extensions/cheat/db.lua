@@ -4,6 +4,7 @@ local sqlite = require "sqlite"
 local VERSION = 0.1 -- should be incremented when sources/presentation/parsing changes.
 
 local dbdir = vim.fn.stdpath "data" .. "/databases"
+
 ---@class CheatDB:sqlite_db
 ---@field state sqlite_tbl
 ---@field cheat sqlite_tbl
@@ -20,6 +21,9 @@ local db = sqlite {
     keyword = "text",
     content = "text",
     ft = "text",
+  },
+  opt = {
+    lazy = true,
   },
 }
 ---@type sqlite_tbl
