@@ -50,18 +50,18 @@ function state:change_version()
 end
 
 function data:seed(cb)
-  print "telesocpe-cheat.nvim: caching databases ........................ "
+  print "telescope-cheat.nvim: caching databases ........................ "
   return raw.get(function(rows)
     self:insert(rows)
-    print "telesocpe-cheat.nvim: databases has been successfully cached."
+    print "telescope-cheat.nvim: databases has been successfully cached."
     cb()
   end)
 end
 
 function data:recache(cb)
-  print "telesocpe-cheat.nvim: recaching databases ...................... "
+  print "telescope-cheat.nvim: recaching databases ...................... "
   return raw.get(function(rows)
-    print "telesocpe-cheat.nvim: databases has been successfully recached."
+    print "telescope-cheat.nvim: databases has been successfully recached."
     self:replace(rows)
     if cb then
       return cb()
