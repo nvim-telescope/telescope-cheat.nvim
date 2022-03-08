@@ -47,4 +47,18 @@ M[2] = {
   end,
 }
 
+M[3] = {
+  name = "nvim-lua-guide",
+  uri = "https://github.com/nanotee/nvim-lua-guide",
+  root = "",
+  depth = 1,
+  pattern = "README.md",
+  add_dirs = false,
+  ft = "markdown",
+  parse = parse,
+  get_ns_keyword = function(path)
+    return "lang", path:match ".*/([^./]+).*"
+  end,
+}
+
 return M
