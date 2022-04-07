@@ -61,4 +61,32 @@ M[3] = {
   end,
 }
 
+M[4] = {
+  name = "rstacruz-cheatsheets",
+  uri = "https://github.com/rstacruz/cheatsheets",
+  root = "",
+  depth = 1,
+  pattern = "%.md",
+  add_dirs = false,
+  ft = "markdown",
+  parse = parse,
+  get_ns_keyword = function(path)
+    return "lang", path:match ".*/([^./]+).*"
+  end,
+}
+
+M[5] = {
+  name = "tldr",
+  uri = "https://github.com/tldr-pages/tldr",
+  root = "",
+  depth = 3,
+  pattern = "%.md",
+  add_dirs = false,
+  ft = "markdown",
+  parse = parse,
+  get_ns_keyword = function(path)
+    return "lang", path:match ".*/([^./]+).*"
+  end,
+}
+
 return M
