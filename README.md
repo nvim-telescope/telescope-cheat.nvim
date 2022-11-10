@@ -1,8 +1,8 @@
 # telescope-cheat.nvim
 
-An attempt to recreate cheat.sh with lua, neovim, [sqlite.lua](https://github.com/tami5/sqlite.lua), and telescope.nvim.
+An attempt to recreate [cheat.sh](https://cheat.sh/) ("Unified access to the best community driven documentation repositories of the world.") with lua, neovim, [sqlite.lua](https://github.com/tami5/sqlite.lua), and telescope.nvim.
 
-![](./preview.gif)
+![screencast](./preview.gif)
 
 ## Installation
 
