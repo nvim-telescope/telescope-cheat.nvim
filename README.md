@@ -1,17 +1,39 @@
 # telescope-cheat.nvim
 
-An attempt to recreate cheat.sh with lua, neovim, [sqlite.lua](https://github.com/tami5/sqlite.lua), and telescope.nvim.
+An attempt to recreate cheat.sh with lua, neovim, [sqlite.lua](https://github.com/kkharji/sqlite.lua), and telescope.nvim.
 
 ![](./preview.gif)
 
 ## Installation
 
+Install via your favorite package manager:
+
+#### [packer.nvim](https://github.com/wbthomason/packer.nvim)
+
 ```lua
-Plug 'tami5/sqlite.lua'
-Plug 'nvim-telescope/telescope-cheat.nvim'
+use {
+    "yorik1984/telescope-cheat.nvim",
+    requires = {
+        "kkharji/sqlite.lua",
+        "nvim-telescope/telescope.nvim"
+    }
+}
 
-lua require'telescope'.load_extension("cheat")
+require("telescope").load_extension("cheat")
+```
 
+#### [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+```lua
+require("lazy").setup({
+    "yorik1984/telescope-cheat.nvim",
+    dependencies = {
+        "kkharji/sqlite.lua",
+        "nvim-telescope/telescope.nvim"
+    }
+})
+
+require("telescope").load_extension("cheat")
 ```
 
 ## Usage
