@@ -20,7 +20,7 @@ local cheat_fd = function(opts)
   local entry_maker = function(entry)
     local displayer = entry_display.create {
       separator = " ",
-      hl_chars = { ["|"] = "TelescopeResultsNumber" },
+      hl_chars = { ["|"] = "Delimiter" },
       items = {
         { width = 30 },
         { remaining = true },
@@ -29,8 +29,8 @@ local cheat_fd = function(opts)
 
     local make_display = function(entry)
       return displayer {
-        { entry.value.keyword, "TelescopeResultsNumber" },
-        { entry.value.ns, "TabLine" },
+        { entry.value.keyword, "Directory" },
+        { entry.value.ns, "Type" },
       }
     end
 

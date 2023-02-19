@@ -47,4 +47,46 @@ M[2] = {
   end,
 }
 
+M[3] = {
+  name = "nvim-lua-guide",
+  uri = "https://github.com/nanotee/nvim-lua-guide",
+  root = "",
+  depth = 1,
+  pattern = "README.md",
+  add_dirs = false,
+  ft = "markdown",
+  parse = parse,
+  get_ns_keyword = function(path)
+    return "lang", path:match ".*/([^./]+).*"
+  end,
+}
+
+M[4] = {
+  name = "rstacruz-cheatsheets",
+  uri = "https://github.com/rstacruz/cheatsheets",
+  root = "",
+  depth = 1,
+  pattern = "%.md",
+  add_dirs = false,
+  ft = "markdown",
+  parse = parse,
+  get_ns_keyword = function(path)
+    return "lang", path:match ".*/([^./]+).*"
+  end,
+}
+
+M[5] = {
+  name = "tldr",
+  uri = "https://github.com/tldr-pages/tldr",
+  root = "",
+  depth = 3,
+  pattern = "%.md",
+  add_dirs = false,
+  ft = "markdown",
+  parse = parse,
+  get_ns_keyword = function(path)
+    return "lang", path:match ".*/([^./]+).*"
+  end,
+}
+
 return M
