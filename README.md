@@ -12,7 +12,7 @@ Install via your favorite package manager:
 
 ```lua
 use {
-    "yorik1984/telescope-cheat.nvim",
+    "nvim-telescope/telescope-cheat.nvim",
     requires = {
         "kkharji/sqlite.lua",
         "nvim-telescope/telescope.nvim"
@@ -26,7 +26,7 @@ require("telescope").load_extension("cheat")
 
 ```lua
 require("lazy").setup({
-    "yorik1984/telescope-cheat.nvim",
+    "nvim-telescope/telescope-cheat.nvim",
     dependencies = {
         "kkharji/sqlite.lua",
         "nvim-telescope/telescope.nvim"
